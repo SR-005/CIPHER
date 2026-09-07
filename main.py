@@ -4,8 +4,16 @@ import threading
 import time
 from fastapi.responses import HTMLResponse
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 
 app=FastAPI(title="CIPHER")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 cameraurl="http://127.0.0.1:5000/"      #url of the live stream. code from camsimulation.py
 currentframebytes=None
@@ -80,7 +88,7 @@ async def get_test_page():
             
             <script>
                 // 1. Connect to the FastAPI WebSocket
-                var ws = new WebSocket("ws://127.0.0.1:8000/ws/video");
+                var ws = new WebSocket(`ws://${location.host}/ws/video`);
                 var img = document.getElementById("videostream");
                 
                 // 2. Every time a message (frame) arrives, update the image
