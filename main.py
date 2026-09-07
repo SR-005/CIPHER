@@ -56,7 +56,7 @@ async def startupevent():
 
 
 #this endpoint will be used by frontend to stream video
-@app.websocket("ws/video")
+@app.websocket("/ws/video")
 async def videowebsocket(websocket: WebSocket):         
     await websocket.accept()
     print("Client connected to WebSocket")
