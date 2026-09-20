@@ -5,6 +5,7 @@ import time
 from fastapi.responses import FileResponse
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from ultralytics import YOLO
 
 app=FastAPI(title="CIPHER")
 app.add_middleware(
@@ -18,27 +19,27 @@ app.add_middleware(
 cameraurl="http://127.0.0.1:5000/"      #url of the live stream. code from camsimulation.py
 currentframebytes=None
 
+model=YOLO("yolov8n.pt")    #initializing model
 
 #contiously pulls frames from the stream
 def capturestreamthread():
     global currentframebytes
+    capture=cv2.VideoCapture(cameraurl)             #getting the live feed
 
-    #getting the live feed
-    capture=cv2.VideoCapture(cameraurl)         
-
-    #if no video feed is available
-    if not capture.isOpened():                  
+    if not capture.isOpened():                      #if no video feed is available
         print("The Camera is not Connected")      
         return
 
-    #if camera feed is available
-    while True:
+    while True:                                     #if camera feed is available
         success,frame=capture.read()
         if success:
-            #YOLO Model to be added
+            #YOLO Proccessing here
+            result=model(frame,classes=[0], verbose=False)      #classes=[0] targets persons only, verbose=False suppresses thinking logs
+            labelledframe=result[0].plot()
+
 
             #compressing video frames to JPEG Images
-            _,buffer=cv2.imencode('.jpg',frame)
+            _,buffer=cv2.imencode('.jpg',labelledframe)
             currentframebytes=buffer.tobytes()
 
         else:
