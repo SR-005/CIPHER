@@ -32,7 +32,7 @@ model=YOLO("yolov8n.pt")    #initializing model
 
 #contiously pulls frames from the stream
 def capturestreamthread():
-    global currentframebytes
+    global currentframebytes, isrecording, posteventcounter, videowriter
     capture=cv2.VideoCapture(cameraurl)             #getting the live feed
 
     if not capture.isOpened():                      #if no video feed is available
@@ -60,7 +60,7 @@ def capturestreamthread():
                 filename=f"incident_{timestamp}.mp4"
                 fourcc=cv2.VideoWriter_fourcc(*'mpv4')          #fourcc is an indentifier which tells the system which compression algorithm to apply
                 height,width,_=labelledframe.shape              #set video height and width same as labelled video height and width
-                videowriter=cv2.VideoWriter(filename,fourcc,30.0,(width,height))
+                videowriter=cv2.VideoWriter(filename,fourcc,30.0,(width,height))    #declaring parameters of videowriter- where to save, how to save etc
 
                 #dump already recorded frames into filename as pre-event footage
                 for bufferedframe in framebuffer:
