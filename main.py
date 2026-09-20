@@ -2,7 +2,7 @@ import cv2
 import asyncio
 import threading
 import time
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -75,43 +75,14 @@ async def videowebsocket(websocket: WebSocket):
 @app.get("/")
 async def get_test_page():
     """Serves a basic HTML page to test the WebSocket stream."""
-    html_content = """
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <title>CIPHER Test Stream</title>
-        </head>
-        <body style="background-color: #111; color: #0f0; text-align: center; font-family: monospace;">
-            <h2>Project CIPHER: Gateway Test</h2>
-            <!-- This is where the video frames will appear -->
-            <img id="videostream" style="border: 2px solid #0f0; border-radius: 8px; max-width: 100%;" />
-            
-            <script>
-                // 1. Connect to the FastAPI WebSocket
-                var ws = new WebSocket(`ws://${location.host}/ws/video`);
-                var img = document.getElementById("videostream");
-                
-                // 2. Every time a message (frame) arrives, update the image
-                ws.onmessage = function(event) {
-                    // Create a blob from the raw JPEG bytes sent by Python
-                    var blob = new Blob([event.data], {type: "image/jpeg"});
-                    // Create a local URL for the blob and set it as the image source
-                    img.src = URL.createObjectURL(blob);
-                };
-                
-                ws.onopen = function() {
-                    console.log("Connected to CIPHER video stream!");
-                };
-            </script>
-        </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content)
+    return FileResponse("stream.html")
 
+#for laptop only
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app,port=8000)
 
+#cross platform- use ipcongif IPv4 Addess as host
 '''if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app,host="0.0.0.0" ,port=8000)'''

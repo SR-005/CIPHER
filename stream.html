@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CIPHER Test Stream</title>
+    </head>
+    <body style="background-color: #111; color: #0f0; text-align: center; font-family: monospace;">
+        <h2>Project CIPHER: Gateway Test</h2>
+        <!-- This is where the video frames will appear -->
+        <img id="videostream" style="border: 2px solid #0f0; border-radius: 8px; max-width: 100%;" />
+        
+        <script>
+            // 1. Connect to the FastAPI WebSocket
+            var ws = new WebSocket(`ws://${location.host}/ws/video`);
+            var img = document.getElementById("videostream");
+            
+            // 2. Every time a message (frame) arrives, update the image
+            ws.onmessage = async function(event) {
+                // If event.data is a Blob, create the object URL directly
+                var blob = event.data instanceof Blob ? event.data : new Blob([event.data], {type: "image/jpeg"});
+                img.src = URL.createObjectURL(blob);
+            };
+            
+            ws.onopen = function() {
+                console.log("Connected to CIPHER video stream!");
+            };
+        </script>
+    </body>
+</html>
